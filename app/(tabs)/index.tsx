@@ -1,25 +1,26 @@
-import { Image, StyleSheet, Platform } from "react-native";
-
-import { HelloWave } from "@/components/HelloWave";
+import { Image, StyleSheet, View } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { BleManager } from "react-native-ble-plx";
-import { useEffect } from "react";
-import { scanAndConnect } from "@/utils/bluetoothScan";
+import { BleManager, Device } from "react-native-ble-plx";
+import { useEffect, useState } from "react";
+import { useLiveDeviceScan } from "@/utils/bluetoothScan";
 
 export const manager = new BleManager();
 
 export default function HomeScreen() {
+  const { devices, startScan, stopScan } = useLiveDeviceScan(manager);
+  const [devicesFound, setDevicesFound] = useState(new Set<Device>());
+
   useEffect(() => {
-    const subscription = manager.onStateChange((state) => {
-      if (state === "PoweredOn") {
-        scanAndConnect(manager);
-        subscription.remove();
-      }
-    }, true);
-    return () => subscription.remove();
-  }, [manager]);
+    startScan();
+    return () => stopScan();
+  }, [startScan, stopScan]);
+
+  useEffect(() => {
+    setDevicesFound(new Set(devices.values()));
+  }, [devices]);
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
@@ -30,24 +31,19 @@ export default function HomeScreen() {
         />
       }
     >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
+      <View>
+        {Array.from(devicesFound).map((device) => (
+          <ThemedView key={device.id}>
+            <ThemedText>{device.localName}</ThemedText>
+            <ThemedText>{device.id}</ThemedText>
+          </ThemedView>
+        ))}
+      </View>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
   reactLogo: {
     height: 178,
     width: 290,

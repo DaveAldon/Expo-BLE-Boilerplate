@@ -15,6 +15,7 @@
     "build-android-apks": "./scripts/build_android.sh",
     "install-android-apks": "bundletool install-apks --apks=./playstore_build.apks",
     "build-ios-distribution": "eas build --profile production --platform ios --local --non-interactive",
+    "build-ios-development": "eas build --profile development --platform ios --local",
     "build-ios-simulator": "eas build --platform ios --profile simulator --local --non-interactive",
     "checkPath": "if [[ $(pwd) =~ .\\ . ]]; then echo 'Error: Path contains space.' && exit 1; else echo 'Path check passed.'; fi",
     "prestart": "npm run checkPath",
@@ -46,7 +47,7 @@
     "react-native-safe-area-context": "4.10.1",
     "react-native-screens": "3.31.1",
     "react-native-web": "~0.19.10",
-    "expo-dev-client": "~4.0.18"
+    "expo-dev-client": "~4.0.19"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
